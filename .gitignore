@@ -1,0 +1,72 @@
+## Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+publish/
+*.publishsettings
+PublishScripts/
+Properties/launchSettings.json
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!packages/build/
+project.lock.json
+project.fragment.lock.json
+
+## Test results / coverage
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+*.trx
+
+## Secrets and local config
+# Real secrets belong in user-secrets (dotnet user-secrets) or env vars,
+# never in a committed appsettings file.
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.p12
+.env
+.env.*
+!.env.example
+
+## Local databases (EF Core / SQLite / LocalDB)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+
+## Logs
+logs/
+*.log
+
+## IDE / editor
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.sln.docstates
+*.user
+*.suo
+*.userosscache
+*.userprefs
+_ReSharper*/
+*.DotSettings.user
+
+## OS
+.DS_Store
+Thumbs.db
+*~
