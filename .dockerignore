@@ -1,0 +1,18 @@
+# Host build output: obj/ holds machine-specific restore paths
+bin/
+obj/
+
+# Secrets are passed in at runtime by compose, never baked into the image
+.env
+.env.*
+
+.git/
+.idea/
+.vscode/
+.claude/
+*.user
+
+Dockerfile
+compose.yaml
+.dockerignore
+Readme.md
