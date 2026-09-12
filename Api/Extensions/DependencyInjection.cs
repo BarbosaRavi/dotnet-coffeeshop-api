@@ -2,9 +2,9 @@ using CoffeeShopApi.Application.Interfaces;
 using CoffeeShopApi.Application.Services;
 using CoffeeShopApi.Infrastructure.Data;
 using CoffeeShopApi.Infrastructure.Repositories;
+using CoffeeShopApi.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Npgsql.Replication;
 
 namespace CoffeeShopApi.Api.Extensions;
 
@@ -15,6 +15,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<ProductService>();
+        services.AddScoped<UserService>();
         
         return services;
     }
@@ -37,7 +38,9 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
 
-        services .AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
         
         return services;
 
