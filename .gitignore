@@ -7,7 +7,6 @@ artifacts/
 publish/
 *.publishsettings
 PublishScripts/
-Properties/launchSettings.json
 
 ## NuGet
 *.nupkg
@@ -31,6 +30,7 @@ coverage*.info
 # Real secrets belong in user-secrets (dotnet user-secrets) or env vars,
 # never in a committed appsettings file.
 appsettings.*.local.json
+appsettings.Local.json
 secrets.json
 *.pfx
 *.p12
