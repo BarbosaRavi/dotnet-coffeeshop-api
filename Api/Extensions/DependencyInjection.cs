@@ -5,17 +5,24 @@ using CoffeeShopApi.Infrastructure.Repositories;
 using CoffeeShopApi.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CoffeeShopApi.Api.Extensions;
 
 public static class DependencyInjection
 {
     public const string CorsPolicy = "DefaultCors";
+    public const string AuthRateLimitPolicy = "auth";
 
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<ProductService>();
         services.AddScoped<UserService>();
+        services.AddScoped<AuthService>();
         
         return services;
     }
@@ -36,11 +43,22 @@ public static class DependencyInjection
             .UseSnakeCaseNamingConvention()
         );
 
+        services.AddSingleton(new JwtOptions(
+            configuration.Required("JWT_ISSUER"),
+            configuration.Required("JWT_AUDIENCE"),
+            configuration.Required("JWT_SECRET"),
+            int.TryParse(configuration["JWT_EXPIRES_MINUTES"], out var minutes) ? minutes : 15,
+            int.TryParse(configuration["JWT_REFRESH_TOKEN_DAYS"], out var days) ? days : 7));
+
+
+        services.AddSingleton<ITokenService, JwtTokenService>();
+
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
 
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         
         return services;
 
@@ -56,6 +74,35 @@ public static class DependencyInjection
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()));
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(o =>
+            {
+                o.MapInboundClaims = false;
+                o.TokenValidationParameters = new()
+                {
+                    ValidIssuer = configuration.Required("JWT_ISSUER"),
+                    ValidAudience = configuration.Required("JWT_AUDIENCE"),
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration.Required("JWT_SECRET"))),
+                    ClockSkew = TimeSpan.FromSeconds(30)
+                };
+            });       
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.AddPolicy(AuthRateLimitPolicy, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
+        });
 
         return services;
     }

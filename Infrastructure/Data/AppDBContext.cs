@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options): DbContext(opt
 {
     public DbSet<Product> Products => Set<Product>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

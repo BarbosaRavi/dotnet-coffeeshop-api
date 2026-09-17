@@ -11,6 +11,9 @@ public class UserRepository(AppDbContext db): IUserRepository
 
     public Task<bool> EmailExistsAsync(string email, CancellationToken ct = default) => db.Users.AnyAsync(u => u.Email == email, ct);
 
+    public Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
+        db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+
     public async Task<(IReadOnlyList<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken ct = default)
     {
         var query = db.Users.AsNoTracking();

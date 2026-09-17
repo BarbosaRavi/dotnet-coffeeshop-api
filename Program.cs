@@ -1,5 +1,6 @@
 using CoffeeShopApi.Api.Extensions;
-using CoffeeShopApi.Api.Middleware;   // new — for GlobalExceptionHandler
+using CoffeeShopApi.Api.Middleware;  
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
@@ -22,5 +23,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 app.UseCors(DependencyInjection.CorsPolicy);
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 app.Run();

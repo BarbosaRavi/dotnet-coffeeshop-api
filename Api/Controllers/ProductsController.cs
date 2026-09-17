@@ -1,11 +1,13 @@
 using CoffeeShopApi.Application.DTOs;
 using CoffeeShopApi.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoffeeShopApi.Api.Controllers;
 
 [ApiController]
 [Route("api/products")]
+[Authorize]
 
 public class ProductsController(ProductService service): ControllerBase
 {
